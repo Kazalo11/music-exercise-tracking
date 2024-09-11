@@ -1,10 +1,3 @@
-// This example demonstrates how to authenticate with Spotify.
-// In order to run this example yourself, you'll need to:
-//
-//  1. Register an application at: https://developer.spotify.com/my-applications/
-//     - Use "http://localhost:8080/callback" as the redirect URI
-//  2. Set the SPOTIFY_ID environment variable to the client ID you got in step 1.
-//  3. Set the SPOTIFY_SECRET environment variable to the client secret from step 1.
 package main
 
 import (
@@ -12,7 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	mapping "music-exercise-tracking/internal/mapping"
+	clientManager "music-exercise-tracking/internal/client"
+	songs "music-exercise-tracking/internal/songs"
 	"music-exercise-tracking/middleware"
 	"net/http"
 
@@ -37,7 +31,6 @@ var (
 
 func main() {
 	var client *spotify.Client
-	var playerResult []spotify.RecentlyPlayedItem
 	router := http.NewServeMux()
 
 	server := http.Server{
@@ -47,6 +40,7 @@ func main() {
 
 	router.HandleFunc("GET /callback", completeAuth)
 	router.HandleFunc("GET /auth", getAuthURL)
+	router.HandleFunc("GET /songs", songs.GetRecentlyPlayed)
 
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Got request for:", r.URL.String())
@@ -54,17 +48,13 @@ func main() {
 
 	go func() {
 		client = <-ch
+		clientManager.SetClient(client)
 
 		user, err := client.CurrentUser(context.Background())
 		if err != nil {
 			log.Fatal(err)
 		}
 		fmt.Println("You are logged in as:", user.ID)
-		playerResult, err = client.PlayerRecentlyPlayed(context.Background())
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Printf("Player result returned: %s", mapping.MapSpotifySongs(playerResult))
 
 	}()
 
@@ -78,11 +68,11 @@ func getAuthURL(w http.ResponseWriter, r *http.Request) {
 
 	response := map[string]string{"url": url}
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	err := json.NewEncoder(w).Encode(response)
-	if err != nil {
+	if err := json.NewEncoder(w).Encode(response); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+
 }
 
 func completeAuth(w http.ResponseWriter, r *http.Request) {
