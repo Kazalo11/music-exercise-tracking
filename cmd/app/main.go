@@ -36,6 +36,7 @@ var (
 
 func main() {
 	var client *spotify.Client
+	var playerState *spotify.PlayerState
 	router := http.NewServeMux()
 
 	server := http.Server{
@@ -53,12 +54,16 @@ func main() {
 	go func() {
 		client = <-ch
 
-		// use the client to make calls that require authorization
 		user, err := client.CurrentUser(context.Background())
 		if err != nil {
 			log.Fatal(err)
 		}
 		fmt.Println("You are logged in as:", user.ID)
+		playerState, err = client.PlayerState(context.Background())
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("Found your %s (%s)\n", playerState.Device.Type, playerState.Device.Name)
 	}()
 
 	fmt.Println("Server is running at http://localhost:8080")
