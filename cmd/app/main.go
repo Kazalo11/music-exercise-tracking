@@ -12,6 +12,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	mapping "music-exercise-tracking/internal/mapping"
 	"music-exercise-tracking/middleware"
 	"net/http"
 
@@ -36,7 +37,7 @@ var (
 
 func main() {
 	var client *spotify.Client
-	var playerState *spotify.PlayerState
+	var playerResult []spotify.RecentlyPlayedItem
 	router := http.NewServeMux()
 
 	server := http.Server{
@@ -59,11 +60,12 @@ func main() {
 			log.Fatal(err)
 		}
 		fmt.Println("You are logged in as:", user.ID)
-		playerState, err = client.PlayerState(context.Background())
+		playerResult, err = client.PlayerRecentlyPlayed(context.Background())
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Printf("Found your %s (%s)\n", playerState.Device.Type, playerState.Device.Name)
+		fmt.Printf("Player result returned: %s", mapping.MapSpotifySongs(playerResult))
+
 	}()
 
 	fmt.Println("Server is running at http://localhost:8080")
