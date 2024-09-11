@@ -11,12 +11,6 @@ function App() {
       .catch((error) => console.error("Error fetching auth URL:", error));
   }, []);
 
-  useEffect(() => {
-    if (authUrl) {
-      window.location.href = authUrl;
-    }
-  }, [authUrl]);
-
   return (
     <div className="App">
       <h1>Authentication</h1>

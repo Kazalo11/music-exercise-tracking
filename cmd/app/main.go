@@ -38,13 +38,9 @@ func main() {
 	var client *spotify.Client
 	router := http.NewServeMux()
 
-	stack := middleware.CreateStack(
-		middleware.Logging,
-		middleware.CORS,
-	)
 	server := http.Server{
 		Addr:    ":8080",
-		Handler: stack(router),
+		Handler: middleware.Logging(router),
 	}
 
 	router.HandleFunc("GET /callback", completeAuth)
@@ -74,6 +70,7 @@ func getAuthURL(w http.ResponseWriter, r *http.Request) {
 	url := auth.AuthURL(state)
 
 	response := map[string]string{"url": url}
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	err := json.NewEncoder(w).Encode(response)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
