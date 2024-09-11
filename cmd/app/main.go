@@ -9,8 +9,10 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
+	"music-exercise-tracking/middleware"
 	"net/http"
 
 	spotifyauth "github.com/zmb3/spotify/v2/auth"
@@ -34,18 +36,25 @@ var (
 
 func main() {
 	var client *spotify.Client
+	router := http.NewServeMux()
 
-	http.HandleFunc("/callback", completeAuth)
+	stack := middleware.CreateStack(
+		middleware.Logging,
+		middleware.CORS,
+	)
+	server := http.Server{
+		Addr:    ":8080",
+		Handler: stack(router),
+	}
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("GET /callback", completeAuth)
+	router.HandleFunc("GET /auth", getAuthURL)
+
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Got request for:", r.URL.String())
 	})
 
 	go func() {
-		url := auth.AuthURL(state)
-		fmt.Println("Please log in to Spotify by visiting the following page in your browser:", url)
-
-		// wait for auth to complete
 		client = <-ch
 
 		// use the client to make calls that require authorization
@@ -56,8 +65,20 @@ func main() {
 		fmt.Println("You are logged in as:", user.ID)
 	}()
 
-	http.ListenAndServe(":8080", nil)
+	fmt.Println("Server is running at http://localhost:8080")
+	server.ListenAndServe()
 
+}
+
+func getAuthURL(w http.ResponseWriter, r *http.Request) {
+	url := auth.AuthURL(state)
+
+	response := map[string]string{"url": url}
+	err := json.NewEncoder(w).Encode(response)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 }
 
 func completeAuth(w http.ResponseWriter, r *http.Request) {
