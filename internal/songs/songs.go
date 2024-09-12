@@ -2,16 +2,16 @@ package somepackage
 
 import (
 	"context"
-	"encoding/json"
 	"log"
 	clientManager "music-exercise-tracking/internal/client"
 	"music-exercise-tracking/internal/mapping"
 	"net/http"
 
+	"github.com/gin-gonic/gin"
 	"github.com/zmb3/spotify/v2"
 )
 
-func GetRecentlyPlayed(w http.ResponseWriter, r *http.Request) {
+func GetRecentlyPlayed(c *gin.Context) {
 	var playerResult []spotify.RecentlyPlayedItem
 	var err error
 	client := clientManager.GetClient()
@@ -24,11 +24,7 @@ func GetRecentlyPlayed(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	response := map[string][]mapping.Song{"songs": mapping.MapSpotifySongs(playerResult)}
 
-	if err := json.NewEncoder(w).Encode(response); err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
+	c.JSON(http.StatusOK, map[string][]mapping.Song{"songs": mapping.MapSpotifySongs(playerResult)})
 
 }

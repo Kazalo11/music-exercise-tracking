@@ -2,12 +2,11 @@ package routes
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
+	"github.com/gin-gonic/gin"
 	"github.com/zmb3/spotify/v2"
 
 	spotifyauth "github.com/zmb3/spotify/v2/auth"
@@ -16,7 +15,7 @@ import (
 	songs "music-exercise-tracking/internal/songs"
 )
 
-const redirectURI = "http://localhost:8080/callback"
+const redirectURI = "http://localhost:8080/v1/spotify/callback"
 
 var (
 	auth = spotifyauth.New(
@@ -26,44 +25,45 @@ var (
 	state = "abc123"
 )
 
-func SpotifyRouter() chi.Router {
-	r := chi.NewRouter()
-	r.Get("/callback", completeAuth)
-	r.Get("/auth", getSpotifyAuthURL)
-	r.Get("/songs", songs.GetRecentlyPlayed)
-	return r
+func SpotifyRoutes(superRoute *gin.RouterGroup) {
+	spotifyRouter := superRoute.Group("/spotify")
+	{
+		spotifyRouter.GET("/callback", completeAuth)
+		spotifyRouter.GET("/auth", getSpotifyAuthURL)
+		spotifyRouter.GET("/songs", songs.GetRecentlyPlayed)
 
+	}
 }
-func completeAuth(w http.ResponseWriter, r *http.Request) {
-	tok, err := auth.Token(r.Context(), state, r)
+func completeAuth(c *gin.Context) {
+	tok, err := auth.Token(c.Request.Context(), state, c.Request)
 	if err != nil {
-		http.Error(w, "Couldn't get token", http.StatusForbidden)
+		c.JSON(http.StatusForbidden, gin.H{"error": "Couldn't get token"})
 		log.Fatal(err)
+		return
 	}
-	if st := r.FormValue("state"); st != state {
-		http.NotFound(w, r)
+	if st := c.Request.FormValue("state"); st != state {
+		c.JSON(http.StatusNotFound, gin.H{"error": "State mismatch"})
 		log.Fatalf("State mismatch: %s != %s\n", st, state)
+		return
 	}
-	client := spotify.New(auth.Client(r.Context(), tok))
-	w.Header().Set("Content-Type", "text/html")
-	fmt.Fprintf(w, "Login Completed!")
+	client := spotify.New(auth.Client(c.Request.Context(), tok))
 	clientManager.SetClient(client)
-
 	user, err := client.CurrentUser(context.Background())
+
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	c.Header("Content-Type", "text/html")
+	c.String(http.StatusOK, fmt.Sprintf("Login Completed! You are logged in as: %s", user.ID))
+
 	fmt.Println("You are logged in as:", user.ID)
 }
 
-func getSpotifyAuthURL(w http.ResponseWriter, r *http.Request) {
+func getSpotifyAuthURL(c *gin.Context) {
 	url := auth.AuthURL(state)
 
-	response := map[string]string{"url": url}
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	if err := json.NewEncoder(w).Encode(response); err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
+	c.Header("Access-Control-Allow-Origin", "*")
+	c.JSON(http.StatusOK, gin.H{"url": url})
 
 }

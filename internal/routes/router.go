@@ -2,20 +2,19 @@ package routes
 
 import (
 	"fmt"
-	"net/http"
 
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
+	"github.com/gin-gonic/gin"
 )
 
 func Start() {
-	r := chi.NewRouter()
-	r.Use(middleware.Logger)
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("hi"))
-	})
-	r.Mount("/spotify", SpotifyRouter())
 
+	router := gin.Default()
+	v1 := router.Group("/v1")
+	AddRoutes(v1)
 	fmt.Println("Server is running at http://localhost:8080")
-	http.ListenAndServe(":8080", r)
+	router.Run()
+}
+
+func AddRoutes(superRoute *gin.RouterGroup) {
+	SpotifyRoutes(superRoute)
 }
