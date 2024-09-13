@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"github.com/zmb3/spotify/v2"
 
 	spotifyauth "github.com/zmb3/spotify/v2/auth"
@@ -30,7 +31,7 @@ func SpotifyRoutes(superRoute *gin.RouterGroup) {
 	{
 		spotifyRouter.GET("/callback", completeSpotifyAuth)
 		spotifyRouter.GET("/auth", getSpotifyAuthURL)
-		spotifyRouter.GET("/songs", songs.GetRecentlyPlayed)
+		spotifyRouter.POST("/songs", songs.GetRecentlyPlayed)
 
 	}
 }
@@ -61,6 +62,10 @@ func completeSpotifyAuth(c *gin.Context) {
 }
 
 func getSpotifyAuthURL(c *gin.Context) {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 	url := auth.AuthURL(state)
 
 	c.Header("Access-Control-Allow-Origin", "*")
