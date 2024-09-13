@@ -131,7 +131,7 @@ func refreshStravaAuthToken(c *gin.Context) {
 
 	authManager.SetAccessToken(tokens.AccessToken)
 
-	c.JSON(http.StatusOK, gin.H{"tokens": tokens})
+	c.JSON(http.StatusOK, gin.H{"message": "Token refreshed successfully"})
 
 }
 
@@ -186,5 +186,5 @@ func getStravaToken(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode json"})
 	}
 
-	c.JSON(http.StatusOK, gin.H{"strava_tokens": tokens})
+	c.JSON(http.StatusOK, gin.H{"message": "Token obtained successfully"})
 }
