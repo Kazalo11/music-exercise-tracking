@@ -3,7 +3,6 @@ package somepackage
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	clientManager "music-exercise-tracking/internal/client"
 	"music-exercise-tracking/internal/mapping"
@@ -79,7 +78,6 @@ func GetRecentlyPlayed(c *gin.Context) {
 	}
 
 	for _, item := range playerResult1 {
-		fmt.Println(set[item.Track.ID])
 		if !set[item.Track.ID] {
 			playerResult = append(playerResult, item)
 		}

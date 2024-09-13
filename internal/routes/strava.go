@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	authManager "music-exercise-tracking/internal/client"
 	"net/http"
 	"net/url"
 	"os"
@@ -26,13 +27,63 @@ type RefreshTokenResponse struct {
 	RefreshToken string `json:"refresh_token"`
 }
 
+type Athlete struct {
+	ID       int    `json:"id"`
+	UserName string `json:"username"`
+}
+
 func StravaRoutes(superRoute *gin.RouterGroup) {
 	stravaRouter := superRoute.Group("strava")
 	{
 		stravaRouter.GET("/auth", getStravaAuthURL)
 		stravaRouter.GET("/exchange_token", getStravaToken)
 		stravaRouter.POST("/refresh", refreshStravaAuthToken)
+		stravaRouter.GET("/athlete", getAthlete)
 	}
+}
+
+func getAthlete(c *gin.Context) {
+	req, err := http.NewRequest("GET", "https://www.strava.com/api/v3/athlete", nil)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create request"})
+		return
+	}
+
+	access_token := authManager.GetAccessToken()
+	fmt.Printf("Access token: %s", access_token)
+
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", access_token))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get athlete"})
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Received non-200 response: %d", resp.StatusCode)})
+		return
+	}
+
+	var athlete Athlete
+
+	err = json.NewDecoder(resp.Body).Decode(&athlete)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode json"})
+	}
+
+	c.JSON(http.StatusOK, gin.H{"athlete": athlete})
+
+	// body, err := io.ReadAll(resp.Body)
+
+	// if err != nil {
+	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+	// 	return
+	// }
+	// c.JSON(http.StatusOK, gin.H{"athlete": string(body)})
+
 }
 
 func refreshStravaAuthToken(c *gin.Context) {
@@ -78,6 +129,8 @@ func refreshStravaAuthToken(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode json"})
 	}
 
+	authManager.SetAccessToken(tokens.AccessToken)
+
 	c.JSON(http.StatusOK, gin.H{"tokens": tokens})
 
 }
@@ -89,7 +142,7 @@ func getStravaAuthURL(c *gin.Context) {
 	}
 	CLIENT_ID := os.Getenv("CLIENT_ID")
 
-	authURL := fmt.Sprintf("http://www.strava.com/oauth/authorize?client_id=%s&response_type=code&redirect_uri=http://localhost:8080/v1/strava/exchange_token&approval_prompt=force&scope=read_all", CLIENT_ID)
+	authURL := fmt.Sprintf("http://www.strava.com/oauth/authorize?client_id=%s&response_type=code&redirect_uri=http://localhost:8080/v1/strava/exchange_token&approval_prompt=force&scope=activity:read_all", CLIENT_ID)
 
 	c.JSON(http.StatusOK, gin.H{"url": authURL})
 }
@@ -126,11 +179,12 @@ func getStravaToken(c *gin.Context) {
 	defer resp.Body.Close()
 
 	var tokens TokenReponse
-
 	err = json.NewDecoder(resp.Body).Decode(&tokens)
+	authManager.SetAccessToken(tokens.AccessToken)
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode json"})
 	}
 
-	c.JSON(http.StatusOK, gin.H{"tokens": tokens})
+	c.JSON(http.StatusOK, gin.H{"strava_tokens": tokens})
 }
