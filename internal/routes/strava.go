@@ -32,6 +32,11 @@ type Athlete struct {
 	UserName string `json:"username"`
 }
 
+type Activity struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
 func StravaRoutes(superRoute *gin.RouterGroup) {
 	stravaRouter := superRoute.Group("strava")
 	{
@@ -39,7 +44,44 @@ func StravaRoutes(superRoute *gin.RouterGroup) {
 		stravaRouter.GET("/exchange_token", getStravaToken)
 		stravaRouter.POST("/refresh", refreshStravaAuthToken)
 		stravaRouter.GET("/athlete", getAthlete)
+		stravaRouter.GET("/activities", getActivities)
 	}
+}
+
+func getActivities(c *gin.Context) {
+	req, err := http.NewRequest("GET", "https://www.strava.com/api/v3/athlete/activities", nil)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create request"})
+		return
+	}
+
+	access_token := authManager.GetAccessToken()
+	fmt.Printf("Access token: %s", access_token)
+
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", access_token))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get activities"})
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Received non-200 response: %d", resp.StatusCode)})
+		return
+	}
+
+	var activities []Activity
+
+	err = json.NewDecoder(resp.Body).Decode(&activities)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode json"})
+	}
+
+	c.JSON(http.StatusOK, gin.H{"activities": activities})
+
 }
 
 func getAthlete(c *gin.Context) {
@@ -50,7 +92,6 @@ func getAthlete(c *gin.Context) {
 	}
 
 	access_token := authManager.GetAccessToken()
-	fmt.Printf("Access token: %s", access_token)
 
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", access_token))
 
@@ -75,14 +116,6 @@ func getAthlete(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"athlete": athlete})
-
-	// body, err := io.ReadAll(resp.Body)
-
-	// if err != nil {
-	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": err})
-	// 	return
-	// }
-	// c.JSON(http.StatusOK, gin.H{"athlete": string(body)})
 
 }
 
