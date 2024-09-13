@@ -38,8 +38,12 @@ type Activity struct {
 	Name      string    `json:"name"`
 	Start     time.Time `json:"start_date"`
 	TimeTaken int       `json:"elapsed_time"`
+	Finish    time.Time `json:"finish_date,omitempty"`
 }
 
+func (a Activity) CalculateFinishTime() time.Time {
+	return a.Start.Add(time.Duration(a.TimeTaken) * time.Second)
+}
 func StravaRoutes(superRoute *gin.RouterGroup) {
 	stravaRouter := superRoute.Group("strava")
 	{
@@ -81,6 +85,10 @@ func getActivities(c *gin.Context) {
 	err = json.NewDecoder(resp.Body).Decode(&activities)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode json"})
+	}
+
+	for i := range activities {
+		activities[i].Finish = activities[i].CalculateFinishTime()
 	}
 
 	c.JSON(http.StatusOK, gin.H{"activities": activities})
