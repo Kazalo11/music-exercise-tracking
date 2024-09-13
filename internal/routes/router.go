@@ -17,4 +17,5 @@ func Start() {
 
 func AddRoutes(superRoute *gin.RouterGroup) {
 	SpotifyRoutes(superRoute)
+	StravaRoutes(superRoute)
 }

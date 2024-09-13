@@ -28,13 +28,13 @@ var (
 func SpotifyRoutes(superRoute *gin.RouterGroup) {
 	spotifyRouter := superRoute.Group("/spotify")
 	{
-		spotifyRouter.GET("/callback", completeAuth)
+		spotifyRouter.GET("/callback", completeSpotifyAuth)
 		spotifyRouter.GET("/auth", getSpotifyAuthURL)
 		spotifyRouter.GET("/songs", songs.GetRecentlyPlayed)
 
 	}
 }
-func completeAuth(c *gin.Context) {
+func completeSpotifyAuth(c *gin.Context) {
 	tok, err := auth.Token(c.Request.Context(), state, c.Request)
 	if err != nil {
 		c.JSON(http.StatusForbidden, gin.H{"error": "Couldn't get token"})
