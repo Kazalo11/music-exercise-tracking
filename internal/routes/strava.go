@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -33,8 +34,10 @@ type Athlete struct {
 }
 
 type Activity struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
+	ID        int       `json:"id"`
+	Name      string    `json:"name"`
+	Start     time.Time `json:"start_date"`
+	TimeTaken int       `json:"elapsed_time"`
 }
 
 func StravaRoutes(superRoute *gin.RouterGroup) {
@@ -49,7 +52,7 @@ func StravaRoutes(superRoute *gin.RouterGroup) {
 }
 
 func getActivities(c *gin.Context) {
-	req, err := http.NewRequest("GET", "https://www.strava.com/api/v3/athlete/activities", nil)
+	req, err := http.NewRequest("GET", "https://www.strava.com/api/v3/athlete/activities?per_page=20", nil)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create request"})
 		return
