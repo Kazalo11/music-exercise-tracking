@@ -19,6 +19,11 @@ type TokenReponse struct {
 	TokenType    string `json:"token_type"`
 	RefreshToken string `json:"refresh_token"`
 	AccessToken  string `json:"access_token"`
+	ExpiresAt    int    `json:"expires_at"`
+}
+
+type RefreshTokenResponse struct {
+	RefreshToken string `json:"refresh_token"`
 }
 
 func StravaRoutes(superRoute *gin.RouterGroup) {
@@ -26,7 +31,55 @@ func StravaRoutes(superRoute *gin.RouterGroup) {
 	{
 		stravaRouter.GET("/auth", getStravaAuthURL)
 		stravaRouter.GET("/exchange_token", getStravaToken)
+		stravaRouter.POST("/refresh", refreshStravaAuthToken)
 	}
+}
+
+func refreshStravaAuthToken(c *gin.Context) {
+	var refresh_token RefreshTokenResponse
+	err := json.NewDecoder(c.Request.Body).Decode(&refresh_token)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode json"})
+	}
+
+	err = godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	CLIENT_SECRET := os.Getenv("CLIENT_SECRET")
+	CLIENT_ID := os.Getenv("CLIENT_ID")
+
+	formData := url.Values{}
+	formData.Set("client_id", CLIENT_ID)
+	formData.Set("client_secret", CLIENT_SECRET)
+	formData.Set("refresh_token", refresh_token.RefreshToken)
+	formData.Set("grant_type", "refresh_token")
+
+	req, err := http.NewRequest("POST", "https://www.strava.com/api/v3/oauth/token", strings.NewReader(formData.Encode()))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create request"})
+		return
+	}
+
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to exchange token"})
+		return
+	}
+	defer resp.Body.Close()
+
+	var tokens TokenReponse
+
+	err = json.NewDecoder(resp.Body).Decode(&tokens)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode json"})
+	}
+
+	c.JSON(http.StatusOK, gin.H{"tokens": tokens})
+
 }
 
 func getStravaAuthURL(c *gin.Context) {
