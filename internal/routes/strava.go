@@ -16,10 +16,10 @@ import (
 var ()
 
 type TokenReponse struct {
-	TokenType    string `json:"token_type"`
-	RefreshToken string `json:"refresh_token"`
-	AccessToken  string `json:"access_token"`
-	ExpiresAt    int    `json:"expires_at"`
+	TokenType string `json:"token_type"`
+	RefreshTokenResponse
+	AccessToken string `json:"access_token"`
+	ExpiresAt   int    `json:"expires_at"`
 }
 
 type RefreshTokenResponse struct {
