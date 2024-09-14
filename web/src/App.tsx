@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 import { Heading, Text } from "@chakra-ui/react";
 import LoginPage from "./components/LoginPage";
@@ -8,15 +8,22 @@ function App() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("http://localhost:8080/v1/auth")
-      .then((response) => response.json())
-      .then((data) => {
-        setIsAuthenticated(data.isAuthenticated);
-      })
-      .catch((error) => {
-        console.error("Error checking authentication status:", error);
-        setError("Error checking authentication status.");
-      });
+    const checkAuthStatus = () => {
+      fetch("http://localhost:8080/v1/auth")
+        .then((response) => response.json())
+        .then((data) => {
+          setIsAuthenticated(data.isAuthenticated);
+        })
+        .catch((error) => {
+          console.error("Error checking authentication status:", error);
+          setError("Error checking authentication status.");
+        });
+    };
+    checkAuthStatus();
+
+    const intervalId = setInterval(checkAuthStatus, 5000);
+
+    return () => clearInterval(intervalId);
   }, []);
 
   return (
