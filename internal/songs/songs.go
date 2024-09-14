@@ -82,6 +82,7 @@ func GetRecentlyPlayed(c *gin.Context) {
 			playerResult = append(playerResult, item)
 		}
 	}
+	c.Header("Access-Control-Allow-Origin", "*")
 
 	c.JSON(http.StatusOK, map[string][]mapping.Song{"songs": mapping.MapSpotifySongs(playerResult)})
 

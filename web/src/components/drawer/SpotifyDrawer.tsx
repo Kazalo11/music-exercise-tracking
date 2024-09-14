@@ -14,6 +14,7 @@ type SpotifyDrawerProps = {
   name: string;
   start_date: string;
   id: string;
+  finish_date: string;
 };
 
 export function SpotifyDrawer({
@@ -22,6 +23,7 @@ export function SpotifyDrawer({
   name,
   start_date,
   id,
+  finish_date,
 }: SpotifyDrawerProps) {
   return (
     <Drawer isOpen={isOpen} placement="right" onClose={onClose}>
@@ -31,7 +33,11 @@ export function SpotifyDrawer({
           Spotify songs listened to during {name} at {start_date}
         </DrawerHeader>
 
-        <SpotifyDrawerBody id={id} />
+        <SpotifyDrawerBody
+          id={id}
+          start_date={start_date}
+          finish_date={finish_date}
+        />
         <DrawerFooter>
           <Button variant="outline" mr={3} onClick={onClose}>
             Close

@@ -28,6 +28,7 @@ export function MainPage() {
             name={selectedActivity?.name}
             start_date={selectedActivity?.start_date}
             id={selectedActivity?.id}
+            finish_date={selectedActivity?.finish_date}
           />
         )}
       </Card>
