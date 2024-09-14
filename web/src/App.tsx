@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import "./App.css";
 import { Heading, Text } from "@chakra-ui/react";
 import LoginPage from "./components/LoginPage";
-import { DropDown } from "./components/Dropdown";
+import { MainPage } from "./components/MainPage";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -27,7 +27,7 @@ function App() {
     <div className="App">
       <Heading>Welcome to Spotify + Strava Tracking</Heading>
       {error && <Text color="red.500">{error}</Text>}
-      {isAuthenticated ? <DropDown /> : <LoginPage />}
+      {isAuthenticated ? <MainPage /> : <LoginPage />}
     </div>
   );
 }
