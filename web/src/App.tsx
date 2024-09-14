@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import "./App.css";
 import { Heading, Text } from "@chakra-ui/react";
 import LoginPage from "./components/LoginPage";
+import { DropDown } from "./components/Dropdown";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -20,21 +21,13 @@ function App() {
         });
     };
     checkAuthStatus();
-
-    const intervalId = setInterval(checkAuthStatus, 5000);
-
-    return () => clearInterval(intervalId);
   }, []);
 
   return (
     <div className="App">
       <Heading>Welcome to Spotify + Strava Tracking</Heading>
       {error && <Text color="red.500">{error}</Text>}
-      {isAuthenticated ? (
-        <Text>Welcome back! You are already authenticated.</Text>
-      ) : (
-        <LoginPage />
-      )}
+      {isAuthenticated ? <DropDown /> : <LoginPage />}
     </div>
   );
 }

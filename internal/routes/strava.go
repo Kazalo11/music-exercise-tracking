@@ -87,6 +87,7 @@ func getActivities(c *gin.Context) {
 	for i := range activities {
 		activities[i].Finish = activities[i].CalculateFinishTime()
 	}
+	c.Header("Access-Control-Allow-Origin", "*")
 
 	c.JSON(http.StatusOK, gin.H{"activities": activities})
 
