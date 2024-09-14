@@ -3,7 +3,6 @@ package routes
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	authManager "music-exercise-tracking/internal/client"
 	"net/http"
 	"net/url"
@@ -12,7 +11,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 )
 
 var ()
@@ -136,13 +134,6 @@ func refreshStravaAuthToken(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode json"})
 	}
 
-	if _, err := os.Stat("/.dockerenv"); os.IsNotExist(err) {
-		err := godotenv.Load()
-		if err != nil {
-			log.Fatalf("Error loading .env file")
-		}
-	}
-
 	CLIENT_SECRET := os.Getenv("CLIENT_SECRET")
 	CLIENT_ID := os.Getenv("CLIENT_ID")
 
@@ -182,12 +173,7 @@ func refreshStravaAuthToken(c *gin.Context) {
 }
 
 func getStravaAuthURL(c *gin.Context) {
-	if _, err := os.Stat("/.dockerenv"); os.IsNotExist(err) {
-		err := godotenv.Load()
-		if err != nil {
-			log.Fatalf("Error loading .env file")
-		}
-	}
+
 	CLIENT_ID := os.Getenv("CLIENT_ID")
 
 	authURL := fmt.Sprintf("http://www.strava.com/oauth/authorize?client_id=%s&response_type=code&redirect_uri=http://localhost:8080/v1/strava/exchange_token&approval_prompt=force&scope=activity:read_all", CLIENT_ID)
@@ -196,12 +182,7 @@ func getStravaAuthURL(c *gin.Context) {
 }
 
 func getStravaToken(c *gin.Context) {
-	if _, err := os.Stat("/.dockerenv"); os.IsNotExist(err) {
-		err := godotenv.Load()
-		if err != nil {
-			log.Fatalf("Error loading .env file")
-		}
-	}
+
 	CLIENT_SECRET := os.Getenv("CLIENT_SECRET")
 	CLIENT_ID := os.Getenv("CLIENT_ID")
 	code := c.Query("code")
