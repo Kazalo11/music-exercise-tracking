@@ -3,6 +3,7 @@ package somepackage
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	clientManager "music-exercise-tracking/internal/client"
 	"music-exercise-tracking/internal/mapping"
@@ -54,7 +55,7 @@ func GetRecentlyPlayed(c *gin.Context) {
 	}
 
 	songsStart, err = client.PlayerRecentlyPlayedOpt(context.Background(), &spotify.RecentlyPlayedOptions{
-		Limit:         50,
+		Limit:         10,
 		BeforeEpochMs: req.Start.UnixMilli(),
 	})
 	if err != nil {
@@ -62,7 +63,7 @@ func GetRecentlyPlayed(c *gin.Context) {
 	}
 
 	songsEnd, err = client.PlayerRecentlyPlayedOpt(context.Background(), &spotify.RecentlyPlayedOptions{
-		Limit:         50,
+		Limit:         10,
 		BeforeEpochMs: req.End.UnixMilli(),
 	})
 	if err != nil {
@@ -71,9 +72,15 @@ func GetRecentlyPlayed(c *gin.Context) {
 
 	for _, item := range songsStart {
 		set[item.Track.ID] = true
+		fmt.Printf("Song Start")
+		fmt.Printf("Track: %s \n", item.Track.Name)
+		fmt.Printf("\n")
 	}
 
 	for _, item := range songsEnd {
+		fmt.Printf("Song Start 2")
+		fmt.Printf("Track: %s \n", item.Track.Name)
+		fmt.Printf("\n")
 		if !set[item.Track.ID] {
 			playerResult = append(playerResult, item)
 		}
