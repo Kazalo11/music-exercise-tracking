@@ -1,6 +1,6 @@
 // components/DropDown.tsx
-import React, { useState, useEffect, ChangeEvent } from "react";
-import { Select, Spinner, Box, useDisclosure } from "@chakra-ui/react";
+import { useState, useEffect, ChangeEvent } from "react";
+import { Select, Spinner, Box } from "@chakra-ui/react";
 
 export type Activity = {
   id: string;
@@ -17,7 +17,6 @@ export function DropDown({ onSelectChange }: DropDownProps) {
   const [options, setOptions] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
-  const { onOpen } = useDisclosure();
 
   useEffect(() => {
     const fetchOptions = async () => {

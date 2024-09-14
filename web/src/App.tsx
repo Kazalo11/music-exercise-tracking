@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import "./App.css";
 import { Heading, Text } from "@chakra-ui/react";
-import LoginPage from "./components/LoginPage";
+import LoginPage from "./components/login/LoginPage";
 import { MainPage } from "./components/MainPage";
 
 function App() {

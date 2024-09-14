@@ -4,15 +4,16 @@ import {
   DrawerContent,
   DrawerCloseButton,
   DrawerHeader,
-  DrawerBody,
   DrawerFooter,
 } from "@chakra-ui/react";
+import { SpotifyDrawerBody } from "./SpotifyDrawerBody";
 
 type SpotifyDrawerProps = {
   isOpen: boolean;
   onClose: () => void;
   name: string;
   start_date: string;
+  id: string;
 };
 
 export function SpotifyDrawer({
@@ -20,6 +21,7 @@ export function SpotifyDrawer({
   onClose,
   name,
   start_date,
+  id,
 }: SpotifyDrawerProps) {
   return (
     <Drawer isOpen={isOpen} placement="right" onClose={onClose}>
@@ -29,8 +31,7 @@ export function SpotifyDrawer({
           Spotify songs listened to during {name} at {start_date}
         </DrawerHeader>
 
-        <DrawerBody>{/* Additional drawer content can go here */}</DrawerBody>
-
+        <SpotifyDrawerBody id={id} />
         <DrawerFooter>
           <Button variant="outline" mr={3} onClick={onClose}>
             Close
