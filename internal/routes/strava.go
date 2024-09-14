@@ -87,7 +87,6 @@ func getActivities(c *gin.Context) {
 	for i := range activities {
 		activities[i].Finish = activities[i].CalculateFinishTime()
 	}
-	c.Header("Access-Control-Allow-Origin", "*")
 
 	c.JSON(http.StatusOK, gin.H{"activities": activities})
 
@@ -178,7 +177,6 @@ func getStravaAuthURL(c *gin.Context) {
 	CLIENT_ID := os.Getenv("CLIENT_ID")
 
 	authURL := fmt.Sprintf("http://www.strava.com/oauth/authorize?client_id=%s&response_type=code&redirect_uri=http://localhost:8080/v1/strava/exchange_token&approval_prompt=force&scope=activity:read_all", CLIENT_ID)
-	c.Header("Access-Control-Allow-Origin", "*")
 	c.JSON(http.StatusOK, gin.H{"url": authURL})
 }
 

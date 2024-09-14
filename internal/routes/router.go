@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	clientManager "music-exercise-tracking/internal/client"
+	"music-exercise-tracking/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,6 +13,7 @@ import (
 func Start() {
 
 	router := gin.Default()
+	router.Use(middleware.CORSMiddleware())
 	v1 := router.Group("/v1")
 	v1.GET("/auth", checkAuth)
 	AddRoutes(v1)

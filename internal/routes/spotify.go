@@ -65,7 +65,6 @@ func completeSpotifyAuth(c *gin.Context) {
 func getSpotifyAuthURL(c *gin.Context) {
 	url := auth.AuthURL(state)
 
-	c.Header("Access-Control-Allow-Origin", "*")
 	c.JSON(http.StatusOK, gin.H{"url": url})
 
 }
