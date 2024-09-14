@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	clientManager "music-exercise-tracking/internal/client"
-	"music-exercise-tracking/middleware"
+	middleware "music-exercise-tracking/middleware"
 
 	"github.com/gin-gonic/gin"
 )

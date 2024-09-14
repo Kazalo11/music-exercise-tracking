@@ -25,7 +25,7 @@ export function SpotifyDrawerBody({
           Accept: "application/json",
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ id, after: start_date, before: finish_date }),
+        body: JSON.stringify({ id, start: start_date, end: finish_date }),
       });
 
       setSong(await response.json());

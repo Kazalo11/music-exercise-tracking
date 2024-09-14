@@ -18,7 +18,7 @@ type CustomTime struct {
 }
 
 func (t *CustomTime) UnmarshalJSON(b []byte) (err error) {
-	date, err := time.Parse(`"2006-01-02T15:04:05.000"`, string(b))
+	date, err := time.Parse(`"2006-01-02T15:04:05Z"`, string(b))
 	if err != nil {
 		return err
 	}
@@ -27,8 +27,8 @@ func (t *CustomTime) UnmarshalJSON(b []byte) (err error) {
 }
 
 type SongsRequest struct {
-	After  CustomTime `json:"after"`
-	Before CustomTime `json:"before"`
+	Start CustomTime `json:"start"`
+	End   CustomTime `json:"end"`
 }
 
 func GetRecentlyPlayed(c *gin.Context) {
@@ -41,8 +41,8 @@ func GetRecentlyPlayed(c *gin.Context) {
 		return
 	}
 
-	var playerResult1 []spotify.RecentlyPlayedItem
-	var playerResult2 []spotify.RecentlyPlayedItem
+	var songsStart []spotify.RecentlyPlayedItem
+	var songsEnd []spotify.RecentlyPlayedItem
 	playerResult := make([]spotify.RecentlyPlayedItem, 0)
 
 	set := make(map[spotify.ID]bool)
@@ -53,31 +53,27 @@ func GetRecentlyPlayed(c *gin.Context) {
 		return
 	}
 
-	rpo := &spotify.RecentlyPlayedOptions{
+	songsStart, err = client.PlayerRecentlyPlayedOpt(context.Background(), &spotify.RecentlyPlayedOptions{
 		Limit:         50,
-		BeforeEpochMs: req.Before.UnixMilli(),
-	}
-
-	playerResult1, err = client.PlayerRecentlyPlayedOpt(context.Background(), rpo)
+		BeforeEpochMs: req.Start.UnixMilli(),
+	})
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	rpo2 := &spotify.RecentlyPlayedOptions{
+	songsEnd, err = client.PlayerRecentlyPlayedOpt(context.Background(), &spotify.RecentlyPlayedOptions{
 		Limit:         50,
-		BeforeEpochMs: req.After.UnixMilli(),
-	}
-
-	playerResult2, err = client.PlayerRecentlyPlayedOpt(context.Background(), rpo2)
+		BeforeEpochMs: req.End.UnixMilli(),
+	})
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	for _, item := range playerResult2 {
+	for _, item := range songsStart {
 		set[item.Track.ID] = true
 	}
 
-	for _, item := range playerResult1 {
+	for _, item := range songsEnd {
 		if !set[item.Track.ID] {
 			playerResult = append(playerResult, item)
 		}
