@@ -8,7 +8,6 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 	"github.com/zmb3/spotify/v2"
 
 	spotifyauth "github.com/zmb3/spotify/v2/auth"
@@ -20,9 +19,11 @@ import (
 const redirectURI = "http://localhost:8080/v1/spotify/callback"
 
 var (
-	auth = spotifyauth.New(
+	SPOTIFY_ID = os.Getenv("SPOTIFY_ID")
+	auth       = spotifyauth.New(
 		spotifyauth.WithRedirectURL(redirectURI),
 		spotifyauth.WithScopes(spotifyauth.ScopeUserReadCurrentlyPlaying, spotifyauth.ScopeUserReadRecentlyPlayed),
+		spotifyauth.WithClientID(SPOTIFY_ID),
 	)
 	state = "abc123"
 )
@@ -56,19 +57,12 @@ func completeSpotifyAuth(c *gin.Context) {
 		log.Fatal(err)
 	}
 
-	c.Header("Content-Type", "text/html")
-	c.String(http.StatusOK, fmt.Sprintf("Login Completed! You are logged in as: %s", user.ID))
+	c.JSON(http.StatusOK, gin.H{"message": "Login completed"})
 
 	fmt.Println("You are logged in as:", user.ID)
 }
 
 func getSpotifyAuthURL(c *gin.Context) {
-	if _, err := os.Stat("/.dockerenv"); os.IsNotExist(err) {
-		err := godotenv.Load()
-		if err != nil {
-			log.Fatalf("Error loading .env file")
-		}
-	}
 	url := auth.AuthURL(state)
 
 	c.Header("Access-Control-Allow-Origin", "*")
