@@ -63,7 +63,6 @@ func getActivities(c *gin.Context) {
 	}
 
 	access_token := authManager.GetAccessToken()
-	fmt.Printf("Access token: %s", access_token)
 
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", access_token))
 
@@ -137,10 +136,13 @@ func refreshStravaAuthToken(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode json"})
 	}
 
-	err = godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
+	if _, err := os.Stat("/.dockerenv"); os.IsNotExist(err) {
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatalf("Error loading .env file")
+		}
 	}
+
 	CLIENT_SECRET := os.Getenv("CLIENT_SECRET")
 	CLIENT_ID := os.Getenv("CLIENT_ID")
 
@@ -180,9 +182,11 @@ func refreshStravaAuthToken(c *gin.Context) {
 }
 
 func getStravaAuthURL(c *gin.Context) {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
+	if _, err := os.Stat("/.dockerenv"); os.IsNotExist(err) {
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatalf("Error loading .env file")
+		}
 	}
 	CLIENT_ID := os.Getenv("CLIENT_ID")
 
@@ -192,9 +196,11 @@ func getStravaAuthURL(c *gin.Context) {
 }
 
 func getStravaToken(c *gin.Context) {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
+	if _, err := os.Stat("/.dockerenv"); os.IsNotExist(err) {
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatalf("Error loading .env file")
+		}
 	}
 	CLIENT_SECRET := os.Getenv("CLIENT_SECRET")
 	CLIENT_ID := os.Getenv("CLIENT_ID")

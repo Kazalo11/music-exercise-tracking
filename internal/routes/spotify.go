@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -62,9 +63,11 @@ func completeSpotifyAuth(c *gin.Context) {
 }
 
 func getSpotifyAuthURL(c *gin.Context) {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
+	if _, err := os.Stat("/.dockerenv"); os.IsNotExist(err) {
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatalf("Error loading .env file")
+		}
 	}
 	url := auth.AuthURL(state)
 
