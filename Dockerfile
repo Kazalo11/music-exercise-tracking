@@ -1,15 +1,14 @@
 #build stage
-FROM golang:1.23.1-alpine AS build
+FROM golang:1.22.7-alpine AS builder
 WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -o server ./cmd/app
+RUN go build -o server ./cmd/app
+
 
 #run stage
 FROM alpine:latest
-WORKDIR /app
-COPY --from=build /app/server .
+COPY --from=builder /app/server /server
 EXPOSE 8080
-CMD ["/app/server"]
-
+CMD ["/server"]
