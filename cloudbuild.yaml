@@ -16,6 +16,3 @@ steps:
         gcloud run deploy music-exercise-tracking-service \
          --image gcr.io/$PROJECT_ID/$(basename $IMAGE):$COMMIT_SHA \
          --region global \
-
-images:
-  - "gcr.io/$PROJECT_ID/music-exercise-tracking-service:$COMMIT_SHA"
