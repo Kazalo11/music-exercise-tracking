@@ -4,6 +4,7 @@ services:
     build:
       context: .
       dockerfile: web/Dockerfile
+      image: frontend:latest
     ports:
       - "3000:3000"
     
@@ -11,6 +12,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      image: backend:latest
 
     env_file:
       - .env
