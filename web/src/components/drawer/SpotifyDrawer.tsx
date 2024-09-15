@@ -1,11 +1,12 @@
 import {
   Button,
   Drawer,
-  DrawerContent,
   DrawerCloseButton,
-  DrawerHeader,
+  DrawerContent,
   DrawerFooter,
+  DrawerHeader,
 } from "@chakra-ui/react";
+import { formatISOString } from "../../Date";
 import { SpotifyDrawerBody } from "./SpotifyDrawerBody";
 
 type SpotifyDrawerProps = {
@@ -31,7 +32,8 @@ export function SpotifyDrawer({
       <DrawerContent>
         <DrawerCloseButton />
         <DrawerHeader>
-          Spotify songs listened to during {name} at {start_date}
+          Spotify songs listened to during {name} at{" "}
+          {formatISOString(start_date)}
         </DrawerHeader>
 
         <SpotifyDrawerBody

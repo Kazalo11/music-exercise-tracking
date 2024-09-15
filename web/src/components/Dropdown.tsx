@@ -1,6 +1,7 @@
 // components/DropDown.tsx
-import { useState, useEffect, ChangeEvent } from "react";
-import { Select, Spinner, Box } from "@chakra-ui/react";
+import { Box, Select, Spinner } from "@chakra-ui/react";
+import { ChangeEvent, useEffect, useState } from "react";
+import { formatISOString } from "../Date";
 
 export type Activity = {
   id: string;
@@ -55,7 +56,7 @@ export function DropDown({ onSelectChange }: DropDownProps) {
     <Select placeholder="Select option" onChange={handleSelectChange}>
       {options.map((option) => (
         <option key={option.id} value={option.id}>
-          {option.name}, with start date: {option.start_date}
+          {option.name}, with start: {formatISOString(option.start_date)}
         </option>
       ))}
     </Select>
