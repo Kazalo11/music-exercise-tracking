@@ -4,44 +4,15 @@ import (
 	"encoding/json"
 	"fmt"
 	authManager "music-exercise-tracking/internal/client"
+	types "music-exercise-tracking/internal/types"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
-var ()
-
-type TokenReponse struct {
-	TokenType string `json:"token_type"`
-	RefreshTokenResponse
-	AccessToken string `json:"access_token"`
-	ExpiresAt   int    `json:"expires_at"`
-}
-
-type RefreshTokenResponse struct {
-	RefreshToken string `json:"refresh_token"`
-}
-
-type Athlete struct {
-	ID       int    `json:"id"`
-	UserName string `json:"username"`
-}
-
-type Activity struct {
-	ID        int       `json:"id"`
-	Name      string    `json:"name"`
-	Start     time.Time `json:"start_date"`
-	TimeTaken int       `json:"elapsed_time"`
-	Finish    time.Time `json:"finish_date,omitempty"`
-}
-
-func (a Activity) CalculateFinishTime() time.Time {
-	return a.Start.Add(time.Duration(a.TimeTaken) * time.Second)
-}
 func StravaRoutes(superRoute *gin.RouterGroup) {
 	stravaRouter := superRoute.Group("strava")
 	{
@@ -77,7 +48,7 @@ func getActivities(c *gin.Context) {
 		return
 	}
 
-	var activities []Activity
+	var activities []types.Activity
 
 	err = json.NewDecoder(resp.Body).Decode(&activities)
 	if err != nil {
@@ -116,7 +87,7 @@ func getAthlete(c *gin.Context) {
 		return
 	}
 
-	var athlete Athlete
+	var athlete types.Athlete
 
 	err = json.NewDecoder(resp.Body).Decode(&athlete)
 	if err != nil {
@@ -128,7 +99,7 @@ func getAthlete(c *gin.Context) {
 }
 
 func refreshStravaAuthToken(c *gin.Context) {
-	var refresh_token RefreshTokenResponse
+	var refresh_token types.RefreshTokenResponse
 	err := json.NewDecoder(c.Request.Body).Decode(&refresh_token)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode json"})
@@ -159,7 +130,7 @@ func refreshStravaAuthToken(c *gin.Context) {
 	}
 	defer resp.Body.Close()
 
-	var tokens TokenReponse
+	var tokens types.TokenReponse
 
 	err = json.NewDecoder(resp.Body).Decode(&tokens)
 	if err != nil {
@@ -208,7 +179,7 @@ func getStravaToken(c *gin.Context) {
 	}
 	defer resp.Body.Close()
 
-	var tokens TokenReponse
+	var tokens types.TokenReponse
 	err = json.NewDecoder(resp.Body).Decode(&tokens)
 	authManager.SetAccessToken(tokens.AccessToken)
 

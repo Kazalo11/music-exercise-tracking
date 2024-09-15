@@ -54,32 +54,30 @@ func GetRecentlyPlayed(c *gin.Context) {
 	}
 
 	songsStart, err = client.PlayerRecentlyPlayedOpt(context.Background(), &spotify.RecentlyPlayedOptions{
-		Limit:         10,
-		BeforeEpochMs: req.Start.UnixMilli(),
+		Limit:        50,
+		AfterEpochMs: req.Start.UnixMilli(),
 	})
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	songsEnd, err = client.PlayerRecentlyPlayedOpt(context.Background(), &spotify.RecentlyPlayedOptions{
-		Limit:         10,
-		BeforeEpochMs: req.End.UnixMilli(),
+		Limit:        50,
+		AfterEpochMs: req.End.UnixMilli(),
 	})
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	for _, item := range songsStart {
-		set[item.Track.ID] = true
-		log.Printf("Song Start")
-		log.Printf("Track: %s \n", item.Track.Name)
-		log.Printf("\n")
-	}
+	log.Printf("Songs Start: %v \n", songsStart)
+	log.Println("-------------")
+	log.Printf("Songs End: %v", songsEnd)
 
 	for _, item := range songsEnd {
-		log.Printf("Song Start 2")
-		log.Printf("Track: %s \n", item.Track.Name)
-		log.Printf("\n")
+		set[item.Track.ID] = true
+
+	}
+
+	for _, item := range songsStart {
 		if !set[item.Track.ID] {
 			playerResult = append(playerResult, item)
 		}
