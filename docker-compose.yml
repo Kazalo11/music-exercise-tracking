@@ -1,5 +1,9 @@
 
 services:
+  frontend:
+    build:
+    context: .
+    dockerfile: web/Dockerfile
     
   backend:
     build:

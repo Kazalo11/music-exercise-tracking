@@ -6,7 +6,8 @@ import { StatusCodes } from "http-status-codes";
 
 export default function LoginPage() {
   const [stravaAuthUrl, setStravaAuthUrl] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [error, _setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {

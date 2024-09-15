@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/components/dropdown.tsx","./src/components/mainpage.tsx","./src/components/card/musiccard.tsx","./src/components/drawer/spotifydrawer.tsx","./src/components/drawer/spotifydrawerbody.tsx","./src/components/login/loginbutton.tsx","./src/components/login/loginpage.tsx"],"version":"5.6.2"}
