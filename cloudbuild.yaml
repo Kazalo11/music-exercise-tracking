@@ -13,9 +13,9 @@ steps:
     args:
       - "-c"
       - |
-        gcloud run deploy SERVICE_NAME \
+        gcloud run deploy music-exercise-tracking-service \
          --image gcr.io/$PROJECT_ID/$(basename $IMAGE):$COMMIT_SHA \
-         --region europe-west2 \
+         --region global \
 
 images:
-  - "gcr.io/$PROJECT_ID/SERVICE_NAME:$COMMIT_SHA"
+  - "gcr.io/$PROJECT_ID/music-exercise-tracking-service:$COMMIT_SHA"
