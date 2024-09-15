@@ -7,7 +7,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 function App() {
   return (
     <div className="App">
-      <Heading>Tracking your music listened during strava exercises</Heading>
+      <Heading>Tracking your music listened during Strava</Heading>
       <Router>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
