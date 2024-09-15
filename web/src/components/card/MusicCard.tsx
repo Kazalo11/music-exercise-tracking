@@ -7,7 +7,7 @@ import {
   ListItem,
   UnorderedList,
 } from "@chakra-ui/react";
-import { formatString } from "../../Date";
+import { formatUnixTimestamp } from "../../Date";
 
 export type MusicCardProps = {
   name: string;
@@ -26,6 +26,7 @@ export type MusicCardProps = {
   url: string;
   date: {
     "#text": string;
+    uts: string;
   };
 };
 
@@ -47,7 +48,7 @@ export function MusicCard(props: MusicCardProps) {
             <ListItem>Album: {props.album["#text"]}</ListItem>
             <ListItem>Artist: {props.artist["#text"]}</ListItem>
             <ListItem>
-              Listened to at: {formatString(props.date["#text"])}
+              Listened to at: {formatUnixTimestamp(props.date.uts)}
             </ListItem>
           </UnorderedList>
         </CardBody>

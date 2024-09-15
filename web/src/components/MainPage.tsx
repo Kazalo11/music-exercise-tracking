@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SpotifyDrawer } from "./drawer/SpotifyDrawer";
 import { Activity, DropDown } from "./Dropdown";
-import UsernameInput from "./input/UserNameInput";
+import { UserNameInput } from "./input/UserNameInput";
 
 export function MainPage() {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -56,7 +56,7 @@ export function MainPage() {
         </CardHeader>
         <CardBody>
           <VStack spacing={4} divider={<StackDivider borderColor="gray.200" />}>
-            <UsernameInput onChange={handleUsernameChange} />
+            <UserNameInput onChange={handleUsernameChange} />
             {submit && (
               <VStack spacing={5}>
                 <Heading size="md">

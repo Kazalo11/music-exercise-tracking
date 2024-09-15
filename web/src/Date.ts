@@ -10,3 +10,7 @@ export function formatISOString(isoDate: string) {
 	return format(date, "MMMM dd, yyyy h:mm a");
       
 }
+
+export function formatUnixTimestamp(timestamp: string) {
+	return format(new Date(Number(timestamp)*1000), "MMMM dd, yyyy h:mm a")
+}

@@ -1,18 +1,18 @@
-import React, { useState } from "react";
+import { LockIcon, UnlockIcon } from "@chakra-ui/icons";
 import {
+  IconButton,
   Input,
-  VStack,
   InputGroup,
   InputRightElement,
-  IconButton,
+  VStack,
 } from "@chakra-ui/react";
-import { LockIcon, UnlockIcon } from "@chakra-ui/icons";
+import React, { useState } from "react";
 
 interface UserNameInputProps {
   onChange: (username: string, isSubmit: boolean) => void;
 }
 
-const UsernameInput = ({ onChange }: UserNameInputProps) => {
+export function UserNameInput({ onChange }: UserNameInputProps) {
   const [username, setUsername] = useState("");
   const [isEditable, setIsEditable] = useState(true);
 
@@ -48,6 +48,4 @@ const UsernameInput = ({ onChange }: UserNameInputProps) => {
       </InputGroup>
     </VStack>
   );
-};
-
-export default UsernameInput;
+}
