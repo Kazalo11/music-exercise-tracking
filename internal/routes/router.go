@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
+	session "github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
+
 	clientManager "music-exercise-tracking/internal/client"
 	middleware "music-exercise-tracking/middleware"
 
@@ -13,6 +16,8 @@ import (
 func Start() {
 
 	router := gin.Default()
+	store := cookie.NewStore()
+	router.Use(session.Sessions("mysession", store))
 	router.Use(middleware.CORSMiddleware())
 	v1 := router.Group("/v1")
 	v1.GET("/auth", checkAuth)

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ButtonGroup, Text } from "@chakra-ui/react";
 import { LoginButton } from "./LoginButton";
 import { useNavigate } from "react-router-dom";
+import { StatusCodes } from "http-status-codes";
 
 export default function LoginPage() {
   const [stravaAuthUrl, setStravaAuthUrl] = useState<string | null>(null);
@@ -9,15 +10,30 @@ export default function LoginPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const checkLoginStatus = () => {
-      const isLoggedIn = localStorage.getItem("isLoggedIn");
-      if (isLoggedIn == "true") {
-        navigate("/main");
+    const getCookie = async () => {
+      const response = await fetch(
+        "http://localhost:8080/v1/strava/access_token",
+        {
+          credentials: "include",
+        }
+      );
+
+      if (response.status == StatusCodes.OK) {
+        navigate("/");
       }
     };
-
-    checkLoginStatus();
+    getCookie();
   }, [navigate]);
+
+  useEffect(() => {
+    const getAuthUrl = async () => {
+      const response = await fetch("http://localhost:8080/v1/strava/auth");
+
+      const authUrl = await response.json();
+      setStravaAuthUrl(authUrl.url);
+    };
+    getAuthUrl();
+  });
 
   return (
     <div>
@@ -26,7 +42,6 @@ export default function LoginPage() {
         <LoginButton
           link={stravaAuthUrl || "#"}
           text={"Login to Strava here"}
-          onClick={() => localStorage.setItem("isLoggedIn", "true")}
         />
       </ButtonGroup>
     </div>

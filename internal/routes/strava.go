@@ -21,6 +21,7 @@ func StravaRoutes(superRoute *gin.RouterGroup) {
 		stravaRouter.POST("/refresh", refreshStravaAuthToken)
 		stravaRouter.GET("/athlete", getAthlete)
 		stravaRouter.GET("/activities", getActivities)
+		stravaRouter.GET("/access_token", getAccessToken)
 	}
 }
 
@@ -96,6 +97,15 @@ func getAthlete(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"athlete": athlete})
 
+}
+
+func getAccessToken(c *gin.Context) {
+	_, err := c.Cookie("access_token")
+	if err != nil {
+		c.String(http.StatusNotFound, "Cookie not found")
+		return
+	}
+	c.String(http.StatusOK, "Cookie found")
 }
 
 func refreshStravaAuthToken(c *gin.Context) {
@@ -187,5 +197,7 @@ func getStravaToken(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode json"})
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Token obtained successfully"})
+	c.SetCookie("access_token", tokens.AccessToken, tokens.ExpiresIn, "/", "localhost", false, true)
+	c.SetCookie("refresh_token", tokens.RefreshToken, tokens.ExpiresIn, "/", "localhost", false, true)
+	c.Redirect(http.StatusFound, "http://localhost:3000")
 }

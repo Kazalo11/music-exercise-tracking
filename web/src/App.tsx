@@ -10,8 +10,8 @@ function App() {
       <Heading>Tracking your music listened during strava exercises</Heading>
       <Router>
         <Routes>
-          <Route path="/" element={<LoginPage />} />
-          <Route path="/main" element={<MainPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/" element={<MainPage />} />
         </Routes>
       </Router>
     </div>

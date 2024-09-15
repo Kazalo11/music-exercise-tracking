@@ -7,6 +7,7 @@ type TokenReponse struct {
 	RefreshTokenResponse
 	AccessToken string `json:"access_token"`
 	ExpiresAt   int    `json:"expires_at"`
+	ExpiresIn   int    `json:"expires_in"`
 }
 
 type RefreshTokenResponse struct {
