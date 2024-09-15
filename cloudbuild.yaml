@@ -15,9 +15,7 @@ steps:
       - |
         gcloud run deploy SERVICE_NAME \
          --image gcr.io/$PROJECT_ID/$(basename $IMAGE):$COMMIT_SHA \
-         --region SERVICE_REGION \
-         --platform managed
+         --region europe-west2 \
 
 images:
-  # List of images to be pushed
   - "gcr.io/$PROJECT_ID/SERVICE_NAME:$COMMIT_SHA"
