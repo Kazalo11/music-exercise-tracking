@@ -10,5 +10,5 @@ RUN  go build -o server ./cmd/app
 FROM alpine:latest
 COPY --from=build /app/server /server
 EXPOSE 8080
-CMD ["./server"]
+CMD ["/server"]
 
