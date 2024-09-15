@@ -33,3 +33,5 @@ steps:
           --image gcr.io/$PROJECT_ID/frontend:$COMMIT_SHA \
           --region europe-west2 \
           --platform managed
+options:
+  logging: CLOUD_LOGGING_ONLY
