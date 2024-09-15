@@ -1,0 +1,9 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: bash
+    args:
+      - 'c'
+      - |
+      docker-compose -f docker-compose.yml up --build -d
+images:
+  - 'gcr.io/$PROJECT_ID/music-exercise-tracking'
