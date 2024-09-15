@@ -6,7 +6,7 @@ import {
   InputRightElement,
   IconButton,
 } from "@chakra-ui/react";
-import { CheckIcon } from "@chakra-ui/icons";
+import { LockIcon, UnlockIcon } from "@chakra-ui/icons";
 
 interface UserNameInputProps {
   onChange: (username: string, isSubmit: boolean) => void;
@@ -41,7 +41,7 @@ const UsernameInput = ({ onChange }: UserNameInputProps) => {
         <InputRightElement>
           <IconButton
             aria-label="Save username"
-            icon={<CheckIcon color="green.500" />}
+            icon={isEditable ? <UnlockIcon /> : <LockIcon />}
             onClick={handleSubmit}
           />
         </InputRightElement>

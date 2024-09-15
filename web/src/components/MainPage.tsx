@@ -7,11 +7,11 @@ import {
   useDisclosure,
   VStack,
 } from "@chakra-ui/react";
-import { Activity, DropDown } from "./Dropdown";
-import { useEffect, useState } from "react";
-import { SpotifyDrawer } from "./drawer/SpotifyDrawer";
-import { useNavigate } from "react-router-dom";
 import { StatusCodes } from "http-status-codes";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { SpotifyDrawer } from "./drawer/SpotifyDrawer";
+import { Activity, DropDown } from "./Dropdown";
 import UsernameInput from "./input/UserNameInput";
 
 export function MainPage() {
@@ -52,15 +52,19 @@ export function MainPage() {
     <>
       <Card>
         <CardHeader>
-          <Heading size="md">
-            Type in your last fm username, and choose a run to see the songs
-            listened to during the run
-          </Heading>
+          <Heading size="md">Type in your last fm username and submit</Heading>
         </CardHeader>
         <CardBody>
           <VStack spacing={4} divider={<StackDivider borderColor="gray.200" />}>
             <UsernameInput onChange={handleUsernameChange} />
-            {submit && <DropDown onSelectChange={handleSelectChange} />}
+            {submit && (
+              <VStack spacing={5}>
+                <Heading size="md">
+                  Select a run to see the songs listened to during it
+                </Heading>
+                <DropDown onSelectChange={handleSelectChange} />
+              </VStack>
+            )}
             {selectedActivity && (
               <SpotifyDrawer
                 isOpen={isOpen}
