@@ -18,7 +18,7 @@ func StravaRoutes(superRoute *gin.RouterGroup) {
 	{
 		stravaRouter.GET("/auth", getStravaAuthURL)
 		stravaRouter.GET("/exchange_token", getStravaToken)
-		stravaRouter.POST("/refresh", refreshStravaAuthToken)
+		stravaRouter.POST("/refresh", refreshStravaAuthTokenHandler)
 		stravaRouter.GET("/athlete", getAthlete)
 		stravaRouter.GET("/activities", getActivities)
 		stravaRouter.GET("/access_token", getAccessToken)
@@ -102,55 +102,78 @@ func getAthlete(c *gin.Context) {
 func getAccessToken(c *gin.Context) {
 	_, err := c.Cookie("access_token")
 	if err != nil {
-		c.String(http.StatusNotFound, "Cookie not found")
+		refreshToken, err := c.Cookie("refresh_token")
+		if err != nil {
+			c.String(http.StatusNotFound, "Cookies not found")
+			return
+		}
+
+		tokens, err := refreshStravaAuthToken(refreshToken)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		authManager.SetAccessToken(tokens.AccessToken)
+		c.SetCookie("access_token", tokens.AccessToken, tokens.ExpiresIn, "/", "localhost", false, true)
+		c.SetCookie("refresh_token", tokens.RefreshToken, 3600, "/", "localhost", false, true)
+		c.String(http.StatusOK, "Token refreshed successfully")
 		return
 	}
 	c.String(http.StatusOK, "Cookie found")
 }
 
-func refreshStravaAuthToken(c *gin.Context) {
-	var refresh_token types.RefreshTokenResponse
-	err := json.NewDecoder(c.Request.Body).Decode(&refresh_token)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode json"})
-	}
-
-	CLIENT_SECRET := os.Getenv("CLIENT_SECRET")
-	CLIENT_ID := os.Getenv("CLIENT_ID")
-
+func refreshStravaAuthToken(refreshToken string) (*types.TokenReponse, error) {
 	formData := url.Values{}
-	formData.Set("client_id", CLIENT_ID)
-	formData.Set("client_secret", CLIENT_SECRET)
-	formData.Set("refresh_token", refresh_token.RefreshToken)
+	formData.Set("client_id", os.Getenv("CLIENT_ID"))
+	formData.Set("client_secret", os.Getenv("CLIENT_SECRET"))
+	formData.Set("refresh_token", refreshToken)
 	formData.Set("grant_type", "refresh_token")
 
 	req, err := http.NewRequest("POST", "https://www.strava.com/api/v3/oauth/token", strings.NewReader(formData.Encode()))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create request"})
-		return
+		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
-
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to exchange token"})
-		return
+		return nil, fmt.Errorf("failed to exchange token: %w", err)
 	}
 	defer resp.Body.Close()
 
-	var tokens types.TokenReponse
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("failed to refresh token, received status code: %d", resp.StatusCode)
+	}
 
+	var tokens types.TokenReponse
 	err = json.NewDecoder(resp.Body).Decode(&tokens)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode json"})
+		return nil, fmt.Errorf("failed to decode json: %w", err)
+	}
+
+	return &tokens, nil
+}
+
+func refreshStravaAuthTokenHandler(c *gin.Context) {
+	var refreshTokenResponse types.RefreshTokenResponse
+	err := json.NewDecoder(c.Request.Body).Decode(&refreshTokenResponse)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode JSON"})
+		return
+	}
+
+	tokens, err := refreshStravaAuthToken(refreshTokenResponse.RefreshToken)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 
 	authManager.SetAccessToken(tokens.AccessToken)
-
+	c.SetCookie("access_token", tokens.AccessToken, tokens.ExpiresIn, "/", "localhost", false, true)
+	c.SetCookie("refresh_token", tokens.RefreshToken, 3600, "/", "localhost", false, true)
 	c.JSON(http.StatusOK, gin.H{"message": "Token refreshed successfully"})
-
 }
 
 func getStravaAuthURL(c *gin.Context) {
@@ -198,6 +221,6 @@ func getStravaToken(c *gin.Context) {
 	}
 
 	c.SetCookie("access_token", tokens.AccessToken, tokens.ExpiresIn, "/", "localhost", false, true)
-	c.SetCookie("refresh_token", tokens.RefreshToken, tokens.ExpiresIn, "/", "localhost", false, true)
+	c.SetCookie("refresh_token", tokens.RefreshToken, 3600, "/", "localhost", false, true)
 	c.Redirect(http.StatusFound, "http://localhost:3000")
 }

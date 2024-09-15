@@ -3,6 +3,7 @@ import { Activity, DropDown } from "./Dropdown";
 import { useEffect, useState } from "react";
 import { SpotifyDrawer } from "./drawer/SpotifyDrawer";
 import { useNavigate } from "react-router-dom";
+import { StatusCodes } from "http-status-codes";
 
 export function MainPage() {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -15,9 +16,22 @@ export function MainPage() {
     onOpen();
   };
 
-  // useEffect(() => {
-  //   navigate("/login");
-  // });
+  useEffect(() => {
+    const getCookie = async () => {
+      const response = await fetch(
+        "http://localhost:8080/v1/strava/access_token",
+        {
+          credentials: "include",
+        }
+      );
+
+      if (response.status == StatusCodes.NOT_FOUND) {
+        navigate("/login");
+      }
+    };
+    getCookie();
+  }, [navigate]);
+
   return (
     <>
       <Card>
