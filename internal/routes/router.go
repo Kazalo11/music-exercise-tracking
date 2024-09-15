@@ -28,7 +28,7 @@ func AddRoutes(superRoute *gin.RouterGroup) {
 }
 
 func checkAuth(c *gin.Context) {
-	authenticated := clientManager.GetAccessToken() != "" && clientManager.GetClient() != nil
+	authenticated := clientManager.GetAccessToken() != ""
 	c.Header("Access-Control-Allow-Origin", "*")
 
 	c.JSON(http.StatusOK, gin.H{"isAuthenticated": authenticated})

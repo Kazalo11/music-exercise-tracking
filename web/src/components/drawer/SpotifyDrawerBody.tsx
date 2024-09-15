@@ -1,37 +1,46 @@
 import { DrawerBody } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
+import { MusicCard, MusicCardProps } from "../card/MusicCard";
 
 type SpotifyDrawerBodyProps = {
-  id: string;
+  user_name: string;
   start_date: string;
   finish_date: string;
 };
-type Song = {
-  name: string;
-  artists: string[];
-};
 
 export function SpotifyDrawerBody({
-  id,
+  user_name,
   start_date,
   finish_date,
 }: SpotifyDrawerBodyProps) {
-  const [song, setSong] = useState<Song | null>(null);
+  const [songs, setSongs] = useState<MusicCardProps[]>([]);
   useEffect(() => {
-    const getActivityInfo = async (id: string) => {
-      const response = await fetch("http://localhost:8080/v1/spotify/songs", {
+    const getActivityInfo = async () => {
+      const response = await fetch("http://localhost:8080/v1/lastfm/tracks", {
         method: "POST",
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ id, start: start_date, end: finish_date }),
+        body: JSON.stringify({
+          user_name,
+          start: start_date,
+          end: finish_date,
+        }),
       });
+      const songsData = await response.json();
+      console.log(songsData);
 
-      setSong(await response.json());
+      setSongs(songsData.tracks);
     };
 
-    getActivityInfo(id);
-  }, [id, start_date, finish_date]);
-  return <DrawerBody>{song?.name}</DrawerBody>;
+    getActivityInfo();
+  }, [user_name, start_date, finish_date]);
+  return (
+    <DrawerBody>
+      {songs.map((song, index) => (
+        <MusicCard key={index} {...song} />
+      ))}
+    </DrawerBody>
+  );
 }

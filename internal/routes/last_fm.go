@@ -64,6 +64,6 @@ func getTracks(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to decode response due to: \n %+v", err)})
 	}
 
-	c.JSON(http.StatusOK, gin.H{"tracks": response.RecentTracks})
+	c.JSON(http.StatusOK, gin.H{"tracks": response.RecentTracks.Tracks})
 
 }

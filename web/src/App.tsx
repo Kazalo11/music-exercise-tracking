@@ -8,6 +8,7 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  //now with using last_fm just need to check if the strava auth is successful
   useEffect(() => {
     const checkAuthStatus = () => {
       fetch("http://localhost:8080/v1/auth")
