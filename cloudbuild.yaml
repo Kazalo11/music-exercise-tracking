@@ -1,9 +1,23 @@
 steps:
-  - name: 'gcr.io/cloud-builders/docker'
-    entrypoint: bash
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
     args:
-      - 'c'
+      - "-c"
       - |
-      docker-compose -f docker-compose.yml up --build -d
+        docker-compose -f docker-compose.yml build
+
+        docker-compose -f docker-compose.yml push
+
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        gcloud run deploy SERVICE_NAME \
+         --image gcr.io/$PROJECT_ID/$(basename $IMAGE):$COMMIT_SHA \
+         --region SERVICE_REGION \
+         --platform managed
+
 images:
-  - 'gcr.io/$PROJECT_ID/music-exercise-tracking'
+  # List of images to be pushed
+  - "gcr.io/$PROJECT_ID/SERVICE_NAME:$COMMIT_SHA"
