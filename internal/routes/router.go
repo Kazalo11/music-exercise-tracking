@@ -24,6 +24,7 @@ func Start() {
 func AddRoutes(superRoute *gin.RouterGroup) {
 	SpotifyRoutes(superRoute)
 	StravaRoutes(superRoute)
+	LastFMRoutes(superRoute)
 }
 
 func checkAuth(c *gin.Context) {

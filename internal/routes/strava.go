@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	authManager "music-exercise-tracking/internal/client"
-	types "music-exercise-tracking/internal/types"
+	"music-exercise-tracking/internal/types"
 	"net/http"
 	"net/url"
 	"os"
