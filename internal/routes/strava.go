@@ -210,7 +210,7 @@ func getStravaToken(c *gin.Context) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to exchange token"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to exchange token due to err: %+v", err)})
 		return
 	}
 	defer resp.Body.Close()
@@ -220,7 +220,7 @@ func getStravaToken(c *gin.Context) {
 	authManager.SetAccessToken(tokens.AccessToken)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode json"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to decode json due to err: %+v", err)})
 	}
 
 	c.SetCookie("access_token", tokens.AccessToken, tokens.ExpiresIn, "/", config.GetFrontendHost(), false, true)
