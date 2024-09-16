@@ -118,8 +118,8 @@ func getAccessToken(c *gin.Context) {
 		}
 
 		authManager.SetAccessToken(tokens.AccessToken)
-		c.SetCookie("access_token", tokens.AccessToken, tokens.ExpiresIn, "/", config.GetFrontendHost(), false, true)
-		c.SetCookie("refresh_token", tokens.RefreshToken, 3600, "/", config.GetFrontendHost(), false, true)
+		c.SetCookie("access_token", tokens.AccessToken, tokens.ExpiresIn, "/", config.GetFrontendDomain(), config.IsSecure(), true)
+		c.SetCookie("refresh_token", tokens.RefreshToken, 3600, "/", config.GetFrontendDomain(), config.IsSecure(), true)
 		c.String(http.StatusOK, "Token refreshed successfully")
 		return
 	}
@@ -174,8 +174,8 @@ func refreshStravaAuthTokenHandler(c *gin.Context) {
 	}
 
 	authManager.SetAccessToken(tokens.AccessToken)
-	c.SetCookie("access_token", tokens.AccessToken, tokens.ExpiresIn, "/", config.GetFrontendHost(), config.IsSecure(), true)
-	c.SetCookie("refresh_token", tokens.RefreshToken, 3600, "/", config.GetFrontendHost(), config.IsSecure(), true)
+	c.SetCookie("access_token", tokens.AccessToken, tokens.ExpiresIn, "/", config.GetFrontendDomain(), config.IsSecure(), true)
+	c.SetCookie("refresh_token", tokens.RefreshToken, 3600, "/", config.GetFrontendDomain(), config.IsSecure(), true)
 	c.JSON(http.StatusOK, gin.H{"message": "Token refreshed successfully"})
 }
 
@@ -223,7 +223,7 @@ func getStravaToken(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to decode json due to err: %+v", err)})
 	}
 
-	c.SetCookie("access_token", tokens.AccessToken, tokens.ExpiresIn, "/", config.GetFrontendHost(), false, true)
-	c.SetCookie("refresh_token", tokens.RefreshToken, 3600, "/", config.GetFrontendHost(), false, true)
+	c.SetCookie("access_token", tokens.AccessToken, tokens.ExpiresIn, "/", config.GetFrontendDomain(), config.IsSecure(), true)
+	c.SetCookie("refresh_token", tokens.RefreshToken, 3600, "/", config.GetFrontendDomain(), config.IsSecure(), true)
 	c.Redirect(http.StatusFound, fmt.Sprintf("%s", config.GetFrontendUrl()))
 }
