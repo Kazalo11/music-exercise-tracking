@@ -1,6 +1,5 @@
 import { DrawerBody } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { loadConfig } from "../../../config/Config";
 import { MusicCard, MusicCardProps } from "../card/MusicCard";
 
 type SpotifyDrawerBodyProps = {
@@ -17,10 +16,8 @@ export function SpotifyDrawerBody({
   const [songs, setSongs] = useState<MusicCardProps[]>([]);
   useEffect(() => {
     const getActivityInfo = async () => {
-      const config = await loadConfig("../../config/Config");
-
       const response = await fetch(
-        `http://${config.server.host}:8080/v1/lastfm/tracks`,
+        `${getBackendHost()}:8080/v1/lastfm/tracks`,
         {
           method: "POST",
           headers: {
