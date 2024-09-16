@@ -225,5 +225,5 @@ func getStravaToken(c *gin.Context) {
 
 	c.SetCookie("access_token", tokens.AccessToken, tokens.ExpiresIn, "/", config.GetFrontendHost(), false, true)
 	c.SetCookie("refresh_token", tokens.RefreshToken, 3600, "/", config.GetFrontendHost(), false, true)
-	c.Redirect(http.StatusFound, fmt.Sprintf("%s:3000", config.GetFrontendHost()))
+	c.Redirect(http.StatusFound, fmt.Sprintf("%s", config.GetFrontendUrl()))
 }
