@@ -17,21 +17,18 @@ export function SpotifyDrawerBody({
   const [songs, setSongs] = useState<MusicCardProps[]>([]);
   useEffect(() => {
     const getActivityInfo = async () => {
-      const response = await fetch(
-        `${getBackendHost()}:8080/v1/lastfm/tracks`,
-        {
-          method: "POST",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            user_name,
-            start: start_date,
-            end: finish_date,
-          }),
-        }
-      );
+      const response = await fetch(`${getBackendHost()}/v1/lastfm/tracks`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_name,
+          start: start_date,
+          end: finish_date,
+        }),
+      });
       const songsData = await response.json();
       console.log(songsData);
 

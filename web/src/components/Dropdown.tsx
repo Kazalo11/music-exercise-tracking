@@ -24,7 +24,7 @@ export function DropDown({ onSelectChange }: DropDownProps) {
     const fetchOptions = async () => {
       try {
         const response = await fetch(
-          `${getBackendHost()}:8080/v1/strava/activities`
+          `${getBackendHost()}/v1/strava/activities`
         );
         if (!response.ok) {
           throw new Error("Network response was not ok");

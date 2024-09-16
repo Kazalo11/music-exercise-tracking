@@ -14,7 +14,7 @@ export default function LoginPage() {
   useEffect(() => {
     const getCookie = async () => {
       const response = await fetch(
-        `${getBackendHost()}:8080/v1/strava/access_token`,
+        `${getBackendHost()}/v1/strava/access_token`,
         {
           credentials: "include",
         }
@@ -29,7 +29,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     const getAuthUrl = async () => {
-      const response = await fetch(`${getBackendHost()}:8080/v1/strava/auth`);
+      const response = await fetch(`${getBackendHost()}/v1/strava/auth`);
 
       const authUrl = await response.json();
       setStravaAuthUrl(authUrl.url);
