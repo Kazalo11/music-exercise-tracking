@@ -11,16 +11,9 @@ func GetBackendHost() string {
 	return "http://localhost"
 }
 
-func GetFrontendDomain() string {
+func GetDomain() string {
 	if os.Getenv("ENV") == "prod" {
-		return "frontend-1052978901140.europe-west2.run.app"
-	}
-	return "localhost"
-}
-
-func GetBackendDomain() string {
-	if os.Getenv("ENV") == "prod" {
-		return "backend-1052978901140.europe-west2.run.app"
+		return "europe-west2.run.app"
 	}
 	return "localhost"
 }
