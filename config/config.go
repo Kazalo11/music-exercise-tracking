@@ -13,7 +13,7 @@ func GetBackendHost() string {
 
 func GetDomain() string {
 	if os.Getenv("ENV") == "prod" {
-		return "europe-west2.run.app"
+		return ".europe-west2.run.app"
 	}
 	return "localhost"
 }
