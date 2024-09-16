@@ -2,6 +2,7 @@ import { ButtonGroup, Text } from "@chakra-ui/react";
 import { StatusCodes } from "http-status-codes";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getBackendHost } from "../../../config/Config";
 import { LoginButton } from "./LoginButton";
 
 export default function LoginPage() {
@@ -13,7 +14,7 @@ export default function LoginPage() {
   useEffect(() => {
     const getCookie = async () => {
       const response = await fetch(
-        `http://${getBackendHost()}/v1/strava/access_token`,
+        `${getBackendHost()}:8080/v1/strava/access_token`,
         {
           credentials: "include",
         }
@@ -28,7 +29,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     const getAuthUrl = async () => {
-      const response = await fetch(`http://${getBackendHost()}/v1/strava/auth`);
+      const response = await fetch(`${getBackendHost()}:8080/v1/strava/auth`);
 
       const authUrl = await response.json();
       setStravaAuthUrl(authUrl.url);

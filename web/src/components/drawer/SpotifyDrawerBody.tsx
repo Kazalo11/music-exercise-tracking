@@ -1,5 +1,6 @@
 import { DrawerBody } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
+import { getBackendHost } from "../../../config/Config";
 import { MusicCard, MusicCardProps } from "../card/MusicCard";
 
 type SpotifyDrawerBodyProps = {
