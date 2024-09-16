@@ -3,7 +3,6 @@ package routes
 import (
 	"encoding/json"
 	"fmt"
-	"music-exercise-tracking/config"
 	authManager "music-exercise-tracking/internal/client"
 	"music-exercise-tracking/internal/types"
 	"net/http"
@@ -11,7 +10,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/spf13/viper"
+	"music-exercise-tracking/config"
 
 	"github.com/gin-gonic/gin"
 )
@@ -103,7 +102,6 @@ func getAthlete(c *gin.Context) {
 }
 
 func getAccessToken(c *gin.Context) {
-	config.GetConfig()
 
 	_, err := c.Cookie("access_token")
 	if err != nil {
@@ -120,8 +118,8 @@ func getAccessToken(c *gin.Context) {
 		}
 
 		authManager.SetAccessToken(tokens.AccessToken)
-		c.SetCookie("access_token", tokens.AccessToken, tokens.ExpiresIn, "/", viper.GetString("server.host"), false, true)
-		c.SetCookie("refresh_token", tokens.RefreshToken, 3600, "/", viper.GetString("server.host"), false, true)
+		c.SetCookie("access_token", tokens.AccessToken, tokens.ExpiresIn, "/", config.GetFrontendHost(), false, true)
+		c.SetCookie("refresh_token", tokens.RefreshToken, 3600, "/", config.GetFrontendHost(), false, true)
 		c.String(http.StatusOK, "Token refreshed successfully")
 		return
 	}
@@ -162,7 +160,6 @@ func refreshStravaAuthToken(refreshToken string) (*types.TokenReponse, error) {
 }
 
 func refreshStravaAuthTokenHandler(c *gin.Context) {
-	config.GetConfig()
 	var refreshTokenResponse types.RefreshTokenResponse
 	err := json.NewDecoder(c.Request.Body).Decode(&refreshTokenResponse)
 	if err != nil {
@@ -177,22 +174,20 @@ func refreshStravaAuthTokenHandler(c *gin.Context) {
 	}
 
 	authManager.SetAccessToken(tokens.AccessToken)
-	c.SetCookie("access_token", tokens.AccessToken, tokens.ExpiresIn, "/", viper.GetString("server.host"), false, true)
-	c.SetCookie("refresh_token", tokens.RefreshToken, 3600, "/", viper.GetString("server.host"), false, true)
+	c.SetCookie("access_token", tokens.AccessToken, tokens.ExpiresIn, "/", config.GetFrontendHost(), false, true)
+	c.SetCookie("refresh_token", tokens.RefreshToken, 3600, "/", config.GetFrontendHost(), false, true)
 	c.JSON(http.StatusOK, gin.H{"message": "Token refreshed successfully"})
 }
 
 func getStravaAuthURL(c *gin.Context) {
-	config.GetConfig()
 
 	CLIENT_ID := os.Getenv("CLIENT_ID")
 
-	authURL := fmt.Sprintf("http://www.strava.com/oauth/authorize?client_id=%s&response_type=code&redirect_uri=%s:8080/v1/strava/exchange_token&approval_prompt=force&scope=activity:read_all", CLIENT_ID, viper.GetString("server.host"))
+	authURL := fmt.Sprintf("http://www.strava.com/oauth/authorize?client_id=%s&response_type=code&redirect_uri=%s:8080/v1/strava/exchange_token&approval_prompt=force&scope=activity:read_all", CLIENT_ID, config.GetFrontendHost())
 	c.JSON(http.StatusOK, gin.H{"url": authURL})
 }
 
 func getStravaToken(c *gin.Context) {
-	config.GetConfig()
 
 	CLIENT_SECRET := os.Getenv("CLIENT_SECRET")
 	CLIENT_ID := os.Getenv("CLIENT_ID")
@@ -228,7 +223,7 @@ func getStravaToken(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode json"})
 	}
 
-	c.SetCookie("access_token", tokens.AccessToken, tokens.ExpiresIn, "/", viper.GetString("server.host"), false, true)
-	c.SetCookie("refresh_token", tokens.RefreshToken, 3600, "/", viper.GetString("server.host"), false, true)
-	c.Redirect(http.StatusFound, fmt.Sprintf("%s:3000", viper.GetString("server.host")))
+	c.SetCookie("access_token", tokens.AccessToken, tokens.ExpiresIn, "/", config.GetFrontendHost(), false, true)
+	c.SetCookie("refresh_token", tokens.RefreshToken, 3600, "/", config.GetFrontendHost(), false, true)
+	c.Redirect(http.StatusFound, fmt.Sprintf("%s:3000", config.GetFrontendHost()))
 }
