@@ -174,8 +174,8 @@ func refreshStravaAuthTokenHandler(c *gin.Context) {
 	}
 
 	authManager.SetAccessToken(tokens.AccessToken)
-	c.SetCookie("access_token", tokens.AccessToken, tokens.ExpiresIn, "/", config.GetFrontendHost(), false, true)
-	c.SetCookie("refresh_token", tokens.RefreshToken, 3600, "/", config.GetFrontendHost(), false, true)
+	c.SetCookie("access_token", tokens.AccessToken, tokens.ExpiresIn, "/", config.GetFrontendHost(), config.IsSecure(), true)
+	c.SetCookie("refresh_token", tokens.RefreshToken, 3600, "/", config.GetFrontendHost(), config.IsSecure(), true)
 	c.JSON(http.StatusOK, gin.H{"message": "Token refreshed successfully"})
 }
 

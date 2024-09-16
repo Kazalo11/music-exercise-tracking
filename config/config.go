@@ -24,3 +24,7 @@ func GetFrontendUrl() string {
 	}
 	return "http://localhost:3000"
 }
+
+func isSecure() bool {
+	return os.Getenv("ENV") == "prod"
+}
