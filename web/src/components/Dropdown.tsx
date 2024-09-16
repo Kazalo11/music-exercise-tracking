@@ -1,6 +1,7 @@
 // components/DropDown.tsx
 import { Box, Select, Spinner } from "@chakra-ui/react";
 import { ChangeEvent, useEffect, useState } from "react";
+import { loadConfig } from "../../config/Config";
 import { formatISOString } from "../Date";
 
 export type Activity = {
@@ -22,8 +23,9 @@ export function DropDown({ onSelectChange }: DropDownProps) {
   useEffect(() => {
     const fetchOptions = async () => {
       try {
+        const config = await loadConfig("../../config/Config");
         const response = await fetch(
-          "http://localhost:8080/v1/strava/activities"
+          `http://${config.server.host}:8080/v1/strava/activities`
         );
         if (!response.ok) {
           throw new Error("Network response was not ok");

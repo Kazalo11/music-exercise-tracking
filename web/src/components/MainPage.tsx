@@ -10,6 +10,7 @@ import {
 import { StatusCodes } from "http-status-codes";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { loadConfig } from "../../config/Config";
 import { SpotifyDrawer } from "./drawer/SpotifyDrawer";
 import { Activity, DropDown } from "./Dropdown";
 import { UserInput } from "./UserInput";
@@ -34,8 +35,10 @@ export function MainPage() {
 
   useEffect(() => {
     const getCookie = async () => {
+      const config = await loadConfig("../../config/Config");
+
       const response = await fetch(
-        "http://localhost:8080/v1/strava/access_token",
+        `http://${config.server.host}/v1/strava/access_token`,
         {
           credentials: "include",
         }
